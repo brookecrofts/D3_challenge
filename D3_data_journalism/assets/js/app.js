@@ -9,13 +9,14 @@ d3.csv("./assets/data/data.csv").then(function(jData) {
 });
     // log a list of states
     // var states = jdata.map(data => jdata.state);
-// var states = jdata.map(jdata=>jdata.state);
-//     console.log("state", state);
+    // var states = jdata.map(jdata=>jdata.state);
+    //     console.log("state", state);
   
     // // Cast each hours value in tvData as a number using the unary + operator
     // jData.forEach(function(data) {
-    //   data.hours = +data.hours;
+    //   data.state = +data.state;
     //   console.log("State:", data.state);
+    // });
     //   console.log("Abbr:", data.abbr);
     // });
 //   })    .catch(function(error) {
@@ -78,31 +79,31 @@ var svg = d3.select("#scatter")
 
 //Read the data
 d3.csv("./assets/data/data.csv", function(data) {
+    console.log(data)
+//   // Add X axis
+//   var x = d3.scaleLinear()
+//     .domain([0, 50])
+//     .range([ 0, width ]);
+//   svg.append("g")
+//     .attr("transform", "translate(0," + height + ")")
+//     .call(d3.axisBottom(x));
 
-  // Add X axis
-  var x = d3.scaleLinear()
-    .domain([0, 50])
-    .range([ 0, width ]);
-  svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+//   // Add Y axis
+//   var y = d3.scaleLinear()
+//     .domain([0, 50])
+//     .range([ height, 0]);
+//   svg.append("g")
+//     .call(d3.axisLeft(y));
 
-  // Add Y axis
-  var y = d3.scaleLinear()
-    .domain([0, 50])
-    .range([ height, 0]);
-  svg.append("g")
-    .call(d3.axisLeft(y));
-
-  // Add dots
-  svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr("cx", function (d) { return x(d.GrLivArea); } )
-      .attr("cy", function (d) { return y(d.SalePrice); } )
-      .attr("r", 1.5)
-      .style("fill", "#69b3a2")
+//   // Add dots
+//   svg.append('g')
+//     .selectAll("dot")
+//     .data(data)
+//     .enter()
+//     .append("circle")
+//       .attr("cx", function (d) { return x(+d.age); } )
+//       .attr("cy", function (d) { return y(+d.smokes); } )
+//       .attr("r", 0.1)
+//       .style("fill", "#69b3a2")
 
 })
