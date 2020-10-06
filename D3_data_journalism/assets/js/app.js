@@ -14,7 +14,7 @@ var svgHeight = 500;
 
 var margin = {
   top: 20,
-  right: 40,
+  right: 20,
   bottom: 60,
   left: 100
 };
@@ -45,11 +45,11 @@ d3.csv("./assets/data/data.csv").then(function(stateData) {
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(stateData, d => d.poverty)])
+      .domain([8, d3.max(stateData, d => d.poverty)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(stateData, d => d.obesity)])
+      .domain([20, d3.max(stateData, d => d.obesity)])
       .range([height, 0]);
 
 
@@ -75,7 +75,7 @@ d3.csv("./assets/data/data.csv").then(function(stateData) {
     .append("circle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.obesity))
-    .attr("r", "15")
+    .attr("r", "10")
     .attr("fill", "blue")
     .attr("opacity", ".5");
 
