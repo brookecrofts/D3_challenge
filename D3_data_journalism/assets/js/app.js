@@ -1,4 +1,3 @@
-// @TODO: YOUR CODE HERE!
 
 //ACTIVITY 16-2-2
 
@@ -7,103 +6,115 @@ d3.csv("./assets/data/data.csv").then(function(jData) {
 
     console.log(jData);
 });
-    // log a list of states
-    // var states = jdata.map(data => jdata.state);
-    // var states = jdata.map(jdata=>jdata.state);
-    //     console.log("state", state);
-  
-    // // Cast each hours value in tvData as a number using the unary + operator
-    // jData.forEach(function(data) {
-    //   data.state = +data.state;
-    //   console.log("State:", data.state);
-    // });
-    //   console.log("Abbr:", data.abbr);
-    // });
-//   })    .catch(function(error) {
-//     console.log(error);
-//   });
 
-//ACTIVITY 16-1-10
+//ACTIVITY 16.3.9
 
-// // Dataset we will be using to set the height of our rectangles.
-// var booksReadThisYear = [17, 23, 20, 34];
+var svgWidth = 960;
+var svgHeight = 500;
 
-// // Setting the dimensions for the SVG container
-// var svgHeight = 600;
-// var svgWidth = 400;
+var margin = {
+  top: 20,
+  right: 40,
+  bottom: 60,
+  left: 100
+};
 
-// var svg = d3
-//   .select("#svg-area")
-//   .append("svg")
-//   .attr("height", svgHeight)
-//   .attr("width", svgWidth);
+var width = svgWidth - margin.left - margin.right;
+var height = svgHeight - margin.top - margin.bottom;
 
-// // svgGroup now refers to the `g` (group) element appended.
-// // The SVG group would normally be aligned to the top left edge of the chart.
-// // Now it is offset to the right and down using the transform attribute
-// var svgGroup = svg.append("g")
-//   .attr("transform", "translate(50, 100)");
-
-// // Selects all rectangles currently on the page - which is none - and binds our dataset to them. If there are no rectangles, it will append one for each piece of data.
-// svgGroup.selectAll("rect")
-//   .data(booksReadThisYear)
-//   .enter()
-//   .append("rect")
-//   .attr("width", 50)
-//   .attr("height", function(data) {
-//     return data * 10;
-//   })
-//   .attr("x", function(data, index) {
-//     return index * 60;
-//   })
-//   .attr("y", function(data) {
-//     return 600 - data * 10;
-//   })
-//   .attr("class", "bar");
-
-//SCATTER PLOT CODE FROM D3 DOCUMENTATION
-
-// set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
+// Create an SVG wrapper, append an SVG group that will hold our chart, and shift the latter by left and top margins.
 var svg = d3.select("#scatter")
   .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+  .attr("width", svgWidth)
+  .attr("height", svgHeight);
 
-//Read the data
-d3.csv("./assets/data/data.csv", function(data) {
-    console.log(data)
-//   // Add X axis
-//   var x = d3.scaleLinear()
-//     .domain([0, 50])
-//     .range([ 0, width ]);
-//   svg.append("g")
-//     .attr("transform", "translate(0," + height + ")")
-//     .call(d3.axisBottom(x));
+var chartGroup = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-//   // Add Y axis
-//   var y = d3.scaleLinear()
-//     .domain([0, 50])
-//     .range([ height, 0]);
-//   svg.append("g")
-//     .call(d3.axisLeft(y));
+// Import Data
+d3.csv("./assets/data/data.csv").then(function(stateData) {
 
-//   // Add dots
-//   svg.append('g')
-//     .selectAll("dot")
-//     .data(data)
-//     .enter()
-//     .append("circle")
-//       .attr("cx", function (d) { return x(+d.age); } )
-//       .attr("cy", function (d) { return y(+d.smokes); } )
-//       .attr("r", 0.1)
-//       .style("fill", "#69b3a2")
+    // Step 1: Parse Data/Cast as numbers
+    // ==============================
+    stateData.forEach(function(data) {
+      // data.abbr = +data.abbr;
+      data.poverty = +data.poverty;
+      data.obesity = +data.obesity;
+    });
 
-})
+    // Step 2: Create scale functions
+    // ==============================
+    var xLinearScale = d3.scaleLinear()
+      .domain([0, d3.max(stateData, d => d.poverty)])
+      .range([0, width]);
+
+    var yLinearScale = d3.scaleLinear()
+      .domain([0, d3.max(stateData, d => d.obesity)])
+      .range([height, 0]);
+
+
+    // Step 3: Create axis functions
+    // ==============================
+    var bottomAxis = d3.axisBottom(xLinearScale);
+    var leftAxis = d3.axisLeft(yLinearScale);
+
+    // Step 4: Append Axes to the chart
+    // ==============================
+    chartGroup.append("g")
+      .attr("transform", `translate(0, ${height})`)
+      .call(bottomAxis);
+
+    chartGroup.append("g")
+      .call(leftAxis);
+
+    // Step 5: Create Circles
+    // ==============================
+    var circlesGroup = chartGroup.selectAll("circle")
+    .data(stateData)
+    .enter()
+    .append("circle")
+    .attr("cx", d => xLinearScale(d.poverty))
+    .attr("cy", d => yLinearScale(d.obesity))
+    .attr("r", "15")
+    .attr("fill", "blue")
+    .attr("opacity", ".5");
+
+    // Step 6: Initialize tool tip
+    // ==============================
+    var toolTip = d3.tip()
+      .attr("class", "tooltip")
+      .offset([80, -60])
+      .html(function(d) {
+        return (`${d.abbr}<br>Poverty Percentage: ${d.poverty}<br>Obesity Percentage ${d.obesity}`);
+      });
+
+    // Step 7: Create tooltip in the chart
+    // ==============================
+    chartGroup.call(toolTip);
+
+    // Step 8: Create event listeners to display and hide the tooltip
+    // ==============================
+    circlesGroup.on("click", function(data) {
+      toolTip.show(data, this);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      });
+
+    // Create axes labels
+    chartGroup.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 40)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .attr("class", "axisText")
+      .text("Obese (%)");
+
+    chartGroup.append("text")
+      .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
+      .attr("class", "axisText")
+      .text("In Poverty (%)");
+  }).catch(function(error) {
+    console.log(error);
+  });
