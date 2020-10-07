@@ -45,11 +45,11 @@ d3.csv("./assets/data/data.csv").then(function(stateData) {
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([8, d3.max(stateData, d => d.poverty)])
+      .domain([8, d3.max(stateData, d => d.poverty)*1.1])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([20, d3.max(stateData, d => d.obesity)])
+      .domain([20, d3.max(stateData, d => d.obesity)*1.1])
       .range([height, 0]);
 
 
@@ -69,15 +69,29 @@ d3.csv("./assets/data/data.csv").then(function(stateData) {
 
     // Step 5: Create Circles
     // ==============================
-    var circlesGroup = chartGroup.selectAll("circle")
+    var circlesGroup = chartGroup.append("g").selectAll("circle")
     .data(stateData)
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.obesity))
-    .attr("r", "10")
+    .attr("r", "20")
     .attr("fill", "blue")
     .attr("opacity", ".5");
+
+    texts = chartGroup.append("g").selectAll("text")
+    .data(stateData)
+    .enter()
+    .append('text')
+    .attr("x", d => xLinearScale(d.poverty))
+    .attr("y", d => yLinearScale(d.obesity))
+    .attr("circle", "right")
+    .text(function(d) {
+      return d.abbr;
+    })
+    .attr("font-family", "arial")
+    .attr("font-size", "10px")
+    .attr("fill", "black");
 
     // Step 6: Initialize tool tip
     // ==============================
@@ -101,6 +115,8 @@ d3.csv("./assets/data/data.csv").then(function(stateData) {
       .on("mouseout", function(data, index) {
         toolTip.hide(data);
       });
+
+
 
     // Create axes labels
     chartGroup.append("text")
